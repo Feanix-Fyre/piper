@@ -37,6 +37,9 @@ def main():
     Trainer.add_argparse_args(parser)
     VitsModel.add_model_specific_args(parser)
     parser.add_argument("--seed", type=int, default=1234)
+    parser.add_argument(
+        "--num_ckpt", default=100, help="# of ckpts saved."
+    )
     args = parser.parse_args()
     _LOGGER.debug(args)
 
@@ -59,10 +62,12 @@ def main():
 
     trainer = Trainer.from_argparse_args(args)
     if args.checkpoint_epochs is not None:
-        trainer.callbacks = [ModelCheckpoint(every_n_epochs=args.checkpoint_epochs)]
+        trainer.callbacks = [ModelCheckpoint(every_n_epochs=args.checkpoint_epochs, save_top_k=args.num_ckpt)]
         _LOGGER.debug(
             "Checkpoints will be saved every %s epoch(s)", args.checkpoint_epochs
         )
+        _LOGGER.debug(
+            "%s Checkpoints will be saved", args.num_ckpt
 
     dict_args = vars(args)
     if args.quality == "x-low":
